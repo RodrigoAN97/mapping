@@ -7,9 +7,9 @@ import { MapService } from './map.service';
   styleUrls: ['./map.component.scss'],
 })
 export class MapComponent implements OnInit {
-  constructor(private map: MapService) {}
+  constructor(private mapService: MapService) {}
 
   ngOnInit(): void {
-    this.map.createMap();
+    this.mapService.createMap();
   }
 }

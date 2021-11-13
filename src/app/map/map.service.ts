@@ -7,11 +7,9 @@ import { environment } from 'src/environments/environment';
 })
 export class MapService {
   map: mapboxgl.Map;
-  style = 'mapbox://styles/mapbox/streets-v11';
-  lat = 45.899977;
-  lng = 6.172652;
-  zoom = 12;
-
+  initialLatitude = 45.899977;
+  initialLongitude = 6.172652;
+  initialZoom = 12;  
   constructor() {}
 
   createMap() {
@@ -19,10 +17,13 @@ export class MapService {
       accessToken: environment.mapbox.accessToken,
       container: 'map',
       style: `https://api.maptiler.com/maps/eef16200-c4cc-4285-9370-c71ca24bb42d/style.json?key=${environment.mapTiler.key}`,
-      zoom: this.zoom,
-      center: [this.lng, this.lat],
+      zoom: this.initialZoom,
+      center: [this.initialLongitude, this.initialLatitude],
     });
-
     this.map.addControl(new mapboxgl.NavigationControl());
+  }
+
+  addMarker(longitude: number, latitude: number) {
+    new mapboxgl.Marker().setLngLat([longitude, latitude]).addTo(this.map);
   }
 }
