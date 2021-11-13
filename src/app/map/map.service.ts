@@ -9,7 +9,7 @@ export class MapService {
   map: mapboxgl.Map;
   initialLongitude = 20;
   initialLatitude = 40;
-  initialZoom = 12;  
+  initialZoom = 12;
   allMarkers: mapboxgl.Marker[] = [];
   constructor() {}
 
@@ -38,5 +38,9 @@ export class MapService {
     return new mapboxgl.Popup({ offset: 25 }).setText(text);
   }
 
+  makeMarkersDraggable() {
+    this.allMarkers.forEach((marker) => {
+      marker.setDraggable(true);
+    });
   }
 }
