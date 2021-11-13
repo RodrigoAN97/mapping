@@ -7,9 +7,10 @@ import { environment } from 'src/environments/environment';
 })
 export class MapService {
   map: mapboxgl.Map;
-  initialLatitude = 45.899977;
-  initialLongitude = 6.172652;
+  initialLongitude = 20;
+  initialLatitude = 40;
   initialZoom = 12;  
+  allMarkers: mapboxgl.Marker[] = [];
   constructor() {}
 
   createMap() {
@@ -24,6 +25,11 @@ export class MapService {
   }
 
   addMarker(longitude: number, latitude: number) {
-    new mapboxgl.Marker().setLngLat([longitude, latitude]).addTo(this.map);
+    const marker = new mapboxgl.Marker()
+      .setLngLat([longitude, latitude])
+      .setPopup(popup)
+      .addTo(this.map);
+    this.allMarkers.push(marker);
+  }
   }
 }
