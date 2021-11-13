@@ -1,17 +1,52 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import * as mapboxgl from 'mapbox-gl';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
-export class MapService {
+export class MapService implements OnInit {
   map: mapboxgl.Map;
-  initialLongitude = 20;
-  initialLatitude = 40;
-  initialZoom = 12;
+  initialSource: mapboxgl.GeoJSONSourceRaw = {
+    type: 'geojson',
+    data: {
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'Point',
+            coordinates: [-91.3952, -0.9145],
+          },
+        },
+        {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'Point',
+            coordinates: [-90.3295, -0.6344],
+          },
+        },
+        {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'Point',
+            coordinates: [-91.3403, 0.0164],
+          },
+        },
+      ],
+    },
+  };
+  initialLongitude = -90.3295;
+  initialLatitude = -0.6344;
+  initialZoom = 5;
   allMarkers: mapboxgl.Marker[] = [];
   constructor() {}
+  ngOnInit(): void {
+    throw new Error('Method not implemented.');
+  }
 
   createMap() {
     this.map = new mapboxgl.Map({
@@ -22,16 +57,47 @@ export class MapService {
       center: [this.initialLongitude, this.initialLatitude],
     });
     this.map.addControl(new mapboxgl.NavigationControl());
+
+    this.map.on('load', () => {
+      this.addLayers();
+      this.getPointerCursorOnEnter();
+      this.centerOnClick();
+    });
   }
 
-  addMarker(longitude: number, latitude: number) {
-    const popup = this.setPopUp('Example Text.');
+  addLayers() {
+    this.map.addSource('points', this.initialSource);
 
-    const marker = new mapboxgl.Marker()
-      .setLngLat([longitude, latitude])
-      .setPopup(popup)
-      .addTo(this.map);
-    this.allMarkers.push(marker);
+    this.map.addLayer({
+      id: 'circle',
+      type: 'circle',
+      source: 'points',
+      paint: {
+        'circle-color': '#4264fb',
+        'circle-radius': 15,
+        'circle-stroke-width': 2,
+        'circle-stroke-color': '#000000',
+      },
+    });
+  }
+
+  centerOnClick() {
+    this.map.on('click', 'circle', (e) => {
+      this.map.flyTo({
+        center: e.lngLat,
+        zoom: 12,
+      });
+    });
+  }
+
+  getPointerCursorOnEnter() {
+    this.map.on('mouseenter', 'circle', () => {
+      this.map.getCanvas().style.cursor = 'pointer';
+    });
+
+    this.map.on('mouseleave', 'circle', () => {
+      this.map.getCanvas().style.cursor = '';
+    });
   }
 
   setPopUp(text: string): mapboxgl.Popup {
