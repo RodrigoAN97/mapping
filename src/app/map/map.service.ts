@@ -25,11 +25,18 @@ export class MapService {
   }
 
   addMarker(longitude: number, latitude: number) {
+    const popup = this.setPopUp('Example Text.');
+
     const marker = new mapboxgl.Marker()
       .setLngLat([longitude, latitude])
       .setPopup(popup)
       .addTo(this.map);
     this.allMarkers.push(marker);
   }
+
+  setPopUp(text: string): mapboxgl.Popup {
+    return new mapboxgl.Popup({ offset: 25 }).setText(text);
+  }
+
   }
 }
