@@ -1,2 +1,8 @@
-<div id="map" class="map-container"></div>
-<button style="position: absolute" (click)="fitScreen()">Fit Screen</button>
+<mat-drawer-container class="drawer-container">
+  <mat-drawer mode="side" opened>
+		<button (click)="fitScreen()">Fit Screen</button>
+	</mat-drawer>
+  <mat-drawer-content>
+		<div id="map" class="map-container"></div>
+  </mat-drawer-content>
+</mat-drawer-container>
