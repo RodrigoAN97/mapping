@@ -40,6 +40,7 @@ export class MapService implements OnInit {
   initialLongitude = -90.3295;
   initialLatitude = -0.6344;
   initialZoom = 5;
+  dragging: string;
   constructor() {}
   ngOnInit(): void {
     throw new Error('Method not implemented.');
@@ -68,6 +69,8 @@ export class MapService implements OnInit {
     let down = false;
     this.map.on('mousedown', 'initial', (e) => {
       down = true;
+      const description = e.features && e.features[0].properties?.description;
+      this.dragging = description;
       e.preventDefault();
       this.map.on('mousemove', (e) => {
         down && this.onMove(e);
@@ -84,7 +87,10 @@ export class MapService implements OnInit {
   ) {
     const lng = e.lngLat.lng;
     const lat = e.lngLat.lat;
-    this.data.features[0].geometry.coordinates = [lng, lat];
+    const index = this.data.features.findIndex(
+      (point: any) => point.properties.description === this.dragging
+    );
+    this.data.features[index].geometry.coordinates = [lng, lat];
 
     const source: mapboxgl.GeoJSONSource = this.map.getSource(
       'initial'
