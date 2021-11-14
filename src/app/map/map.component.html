@@ -1,8 +1,23 @@
 <mat-drawer-container class="drawer-container">
   <mat-drawer mode="side" opened>
-		<button (click)="fitScreen()">Fit Screen</button>
-	</mat-drawer>
+    <mat-toolbar color="primary">
+      <span>Interactive Map</span>
+    </mat-toolbar>
+    <div class="line">
+      <h4>Points Behavior</h4>
+      <p>Click to zoom</p>
+      <p>Double click to show popup with description</p>
+      <p>Drag to change coordinates</p>
+    </div>
+    <mat-divider></mat-divider>
+    <div class="line">
+      <button mat-raised-button color="accent" (click)="fitScreen()">
+        Fit Screen (auto zoom) to show all points
+      </button>
+    </div>
+    <mat-divider></mat-divider>
+  </mat-drawer>
   <mat-drawer-content>
-		<div id="map" class="map-container"></div>
+    <div id="map" class="map-container"></div>
   </mat-drawer-content>
 </mat-drawer-container>

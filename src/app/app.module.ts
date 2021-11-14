@@ -6,6 +6,10 @@ import { AppComponent } from './app.component';
 import { MapComponent } from './map/map.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatListModule } from '@angular/material/list';
 
 @NgModule({
   declarations: [AppComponent, MapComponent],
@@ -14,6 +18,10 @@ import { MatSidenavModule } from '@angular/material/sidenav';
     AppRoutingModule,
     NoopAnimationsModule,
     MatSidenavModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatDividerModule,
+    MatListModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
