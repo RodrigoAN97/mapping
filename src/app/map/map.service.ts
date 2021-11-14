@@ -14,7 +14,7 @@ export class MapService implements OnInit {
       features: [
         {
           type: 'Feature',
-          properties: {},
+          properties: { description: 'First' },
           geometry: {
             type: 'Point',
             coordinates: [-91.3952, -0.9145],
@@ -22,7 +22,7 @@ export class MapService implements OnInit {
         },
         {
           type: 'Feature',
-          properties: {},
+          properties: { description: 'Second' },
           geometry: {
             type: 'Point',
             coordinates: [-90.3295, -0.6344],
@@ -30,7 +30,7 @@ export class MapService implements OnInit {
         },
         {
           type: 'Feature',
-          properties: {},
+          properties: { description: 'Third' },
           geometry: {
             type: 'Point',
             coordinates: [-91.3403, 0.0164],
@@ -60,6 +60,7 @@ export class MapService implements OnInit {
 
     this.map.on('load', () => {
       this.addLayers();
+      this.setPopUp();
       this.getPointerCursorOnEnter();
       this.centerOnClick();
     });
@@ -83,10 +84,12 @@ export class MapService implements OnInit {
 
   centerOnClick() {
     this.map.on('click', 'circle', (e) => {
-      this.map.flyTo({
-        center: e.lngLat,
-        zoom: 12,
-      });
+      if (e.features) {
+        this.map.flyTo({
+          center: (e.features[0].geometry as any).coordinates,
+          zoom: 12,
+        });
+      }
     });
   }
 
@@ -100,8 +103,16 @@ export class MapService implements OnInit {
     });
   }
 
-  setPopUp(text: string): mapboxgl.Popup {
-    return new mapboxgl.Popup({ offset: 25 }).setText(text);
+  setPopUp() {
+    this.map.on('dblclick', 'circle', (e) => {
+      if (e.features && e.features[0].properties) {
+        e.preventDefault();
+        new mapboxgl.Popup()
+          .setLngLat((e.features[0].geometry as any).coordinates)
+          .setText(e.features[0].properties.description)
+          .addTo(this.map);
+      }
+    });
   }
 
   fitScreen() {
