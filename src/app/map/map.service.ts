@@ -57,9 +57,9 @@ export class MapService implements OnInit {
 
     this.map.on('load', () => {
       this.addLayers();
-      // this.setPopUp();
-      // this.getPointerCursorOnEnter();
-      // this.centerOnClick();
+      this.setPopUp();
+      this.getPointerCursorOnEnter();
+      this.centerOnClick();
       this.makeDraggable();
     });
   }
@@ -82,7 +82,6 @@ export class MapService implements OnInit {
   onMove(
     e: (mapboxgl.MapMouseEvent | mapboxgl.MapTouchEvent) & mapboxgl.EventData
   ) {
-    console.log('move');
     const lng = e.lngLat.lng;
     const lat = e.lngLat.lat;
     this.data.features[0].geometry.coordinates = [lng, lat];
