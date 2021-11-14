@@ -7,42 +7,39 @@ import { environment } from 'src/environments/environment';
 })
 export class MapService implements OnInit {
   map: mapboxgl.Map;
-  initialSource: mapboxgl.GeoJSONSourceRaw = {
-    type: 'geojson',
-    data: {
-      type: 'FeatureCollection',
-      features: [
-        {
-          type: 'Feature',
-          properties: { description: 'First' },
-          geometry: {
-            type: 'Point',
-            coordinates: [-91.3952, -0.9145],
-          },
+  data: any = {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        properties: { description: 'First' },
+        geometry: {
+          type: 'Point',
+          coordinates: [-91.3952, -0.9145],
         },
-        {
-          type: 'Feature',
-          properties: { description: 'Second' },
-          geometry: {
-            type: 'Point',
-            coordinates: [-90.3295, -0.6344],
-          },
+      },
+      {
+        type: 'Feature',
+        properties: { description: 'Second' },
+        geometry: {
+          type: 'Point',
+          coordinates: [-90.3295, -0.6344],
         },
-        {
-          type: 'Feature',
-          properties: { description: 'Third' },
-          geometry: {
-            type: 'Point',
-            coordinates: [-91.3403, 0.0164],
-          },
+      },
+      {
+        type: 'Feature',
+        properties: { description: 'Third' },
+        geometry: {
+          type: 'Point',
+          coordinates: [-91.3403, 0.0164],
         },
-      ],
-    },
+      },
+    ],
   };
+
   initialLongitude = -90.3295;
   initialLatitude = -0.6344;
   initialZoom = 5;
-  allMarkers: mapboxgl.Marker[] = [];
   constructor() {}
   ngOnInit(): void {
     throw new Error('Method not implemented.');
@@ -60,19 +57,56 @@ export class MapService implements OnInit {
 
     this.map.on('load', () => {
       this.addLayers();
-      this.setPopUp();
-      this.getPointerCursorOnEnter();
-      this.centerOnClick();
+      // this.setPopUp();
+      // this.getPointerCursorOnEnter();
+      // this.centerOnClick();
+      this.makeDraggable();
     });
   }
 
+  makeDraggable() {
+    let down = false;
+    this.map.on('mousedown', 'initial', (e) => {
+      down = true;
+      e.preventDefault();
+      this.map.on('mousemove', (e) => {
+        down && this.onMove(e);
+      });
+      this.map.once('mouseup', () => {
+        down = false;
+        this.onUp();
+      });
+    });
+  }
+
+  onMove(
+    e: (mapboxgl.MapMouseEvent | mapboxgl.MapTouchEvent) & mapboxgl.EventData
+  ) {
+    console.log('move');
+    const lng = e.lngLat.lng;
+    const lat = e.lngLat.lat;
+    this.data.features[0].geometry.coordinates = [lng, lat];
+
+    const source: mapboxgl.GeoJSONSource = this.map.getSource(
+      'initial'
+    ) as mapboxgl.GeoJSONSource;
+    source.setData(this.data);
+  }
+
+  onUp() {
+    this.map.off('mousemove', (e) => this.onMove(e));
+  }
+
   addLayers() {
-    this.map.addSource('points', this.initialSource);
+    this.map.addSource('initial', {
+      type: 'geojson',
+      data: this.data,
+    });
 
     this.map.addLayer({
-      id: 'circle',
+      id: 'initial',
+      source: 'initial',
       type: 'circle',
-      source: 'points',
       paint: {
         'circle-color': '#4264fb',
         'circle-radius': 15,
@@ -83,7 +117,7 @@ export class MapService implements OnInit {
   }
 
   centerOnClick() {
-    this.map.on('click', 'circle', (e) => {
+    this.map.on('click', 'initial', (e) => {
       if (e.features) {
         this.map.flyTo({
           center: (e.features[0].geometry as any).coordinates,
@@ -94,17 +128,17 @@ export class MapService implements OnInit {
   }
 
   getPointerCursorOnEnter() {
-    this.map.on('mouseenter', 'circle', () => {
+    this.map.on('mouseenter', 'initial', () => {
       this.map.getCanvas().style.cursor = 'pointer';
     });
 
-    this.map.on('mouseleave', 'circle', () => {
+    this.map.on('mouseleave', 'initial', () => {
       this.map.getCanvas().style.cursor = '';
     });
   }
 
   setPopUp() {
-    this.map.on('dblclick', 'circle', (e) => {
+    this.map.on('dblclick', 'initial', (e) => {
       if (e.features && e.features[0].properties) {
         e.preventDefault();
         new mapboxgl.Popup()
@@ -117,16 +151,10 @@ export class MapService implements OnInit {
 
   fitScreen() {
     var bounds = new mapboxgl.LngLatBounds();
-    (this.initialSource.data as any).features.forEach((feature: any) => {
+    this.data.features.forEach((feature: any) => {
       bounds.extend(feature.geometry.coordinates);
     });
 
     this.map.fitBounds(bounds, { padding: 100 });
-  }
-
-  makeMarkersDraggable() {
-    this.allMarkers.forEach((marker) => {
-      marker.setDraggable(true);
-    });
   }
 }
