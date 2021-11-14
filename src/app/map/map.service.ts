@@ -7,7 +7,7 @@ import { environment } from 'src/environments/environment';
 })
 export class MapService implements OnInit {
   map: mapboxgl.Map;
-  initialSource: mapboxgl.GeoJSONSourceRaw = {
+  initialSource: any = {
     type: 'geojson',
     data: {
       type: 'FeatureCollection',
@@ -102,6 +102,15 @@ export class MapService implements OnInit {
 
   setPopUp(text: string): mapboxgl.Popup {
     return new mapboxgl.Popup({ offset: 25 }).setText(text);
+  }
+
+  fitScreen() {
+    var bounds = new mapboxgl.LngLatBounds();
+    this.initialSource.data.features.forEach((feature: any) => {
+      bounds.extend(feature.geometry.coordinates);
+    });
+
+    this.map.fitBounds(bounds, { padding: 100 });
   }
 
   makeMarkersDraggable() {
