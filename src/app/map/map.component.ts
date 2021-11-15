@@ -105,26 +105,16 @@ export class MapComponent implements OnInit {
       });
 
     this.layersFields.valueChanges.subscribe((changes) => {
-      let descriptions: string[] = [];
-      let newLayers: fromMap.IPointFeature[] = changes.map(
-        (layer: any) => {
-          if (!descriptions.includes(layer.description)) {
-            descriptions.push(layer.description);
-            return {
-              type: 'Feature',
-              properties: { description: layer.description },
-              geometry: {
-                type: 'Point',
-                coordinates: [layer.longitude, layer.latitude],
-              },
-            };
-          } else {
-            this.snackBar.open('Description needs to be unique', 'ERROR', {
-              duration: 3000,
-            });
-          }
-        }
-      );
+      let newLayers: fromMap.IPointFeature[] = changes.map((layer: any) => {
+          return {
+            type: 'Feature',
+            properties: { description: layer.description },
+            geometry: {
+              type: 'Point',
+              coordinates: [layer.longitude, layer.latitude],
+            },
+          };
+      });
       const source: mapboxgl.GeoJSONSource = this.map.getSource(
         'points'
       ) as mapboxgl.GeoJSONSource;
