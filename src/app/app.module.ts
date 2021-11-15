@@ -11,6 +11,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
 import { StoreModule } from '@ngrx/store';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { environment } from '../environments/environment'; // Angular CLI environment
 import { reducers } from './app.reducer';
 @NgModule({
   declarations: [AppComponent, MapComponent],
@@ -24,6 +26,11 @@ import { reducers } from './app.reducer';
     MatDividerModule,
     MatListModule,
     StoreModule.forRoot(reducers),
+    StoreDevtoolsModule.instrument({
+      maxAge: 25,
+      logOnly: environment.production,
+      autoPause: true,
+    }),
   ],
   providers: [],
   bootstrap: [AppComponent],

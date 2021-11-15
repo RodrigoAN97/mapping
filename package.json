@@ -21,6 +21,7 @@
     "@angular/platform-browser-dynamic": "~12.1.0",
     "@angular/router": "~12.1.0",
     "@ngrx/store": "^12.5.1",
+    "@ngrx/store-devtools": "^12.5.1",
     "@types/mapbox-gl": "^2.4.2",
     "mapbox-gl": "^2.6.0",
     "rxjs": "~6.6.0",
