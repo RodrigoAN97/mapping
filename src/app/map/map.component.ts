@@ -61,6 +61,7 @@ export class MapComponent implements OnInit {
     }
     this.layersArray = this.layersFields;
     this.layersArray.push(add);
+    console.log(this.layersArray.value);
   }
 
   deleteLayerOnForm(index: number) {
@@ -103,9 +104,9 @@ export class MapComponent implements OnInit {
         this.updateLayers(layers);
       });
 
-    this.mapsForm.valueChanges.subscribe((changes) => {
+    this.layersFields.valueChanges.subscribe((changes) => {
       let descriptions: string[] = [];
-      let newLayers: fromMap.IPointFeature[] = changes.layers.map(
+      let newLayers: fromMap.IPointFeature[] = changes.map(
         (layer: any) => {
           if (!descriptions.includes(layer.description)) {
             descriptions.push(layer.description);
