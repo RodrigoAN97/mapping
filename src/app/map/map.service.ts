@@ -2,6 +2,7 @@ import { Injectable, OnInit } from '@angular/core';
 import * as mapboxgl from 'mapbox-gl';
 import { environment } from 'src/environments/environment';
 import { Store } from '@ngrx/store';
+import { first } from 'rxjs/operators';
 import * as fromMap from './map.reducer';
 import * as Map from './map.actions';
 import * as _ from 'lodash';
@@ -84,25 +85,27 @@ export class MapService implements OnInit {
   }
 
   addLayers() {
-    // TODO: only runs if there is no source with id
-    this.store.select(fromMap.getLayers).subscribe((layers) => {
-      this.map.addSource('points', {
-        type: 'geojson',
-        data: { type: 'FeatureCollection', features: layers },
-      });
+    this.store
+      .select(fromMap.getLayers)
+      .pipe(first())
+      .subscribe((layers) => {
+        this.map.addSource('points', {
+          type: 'geojson',
+          data: { type: 'FeatureCollection', features: layers },
+        });
 
-      this.map.addLayer({
-        id: 'points',
-        source: 'points',
-        type: 'circle',
-        paint: {
-          'circle-color': '#4264fb',
-          'circle-radius': 15,
-          'circle-stroke-width': 2,
-          'circle-stroke-color': '#000000',
-        },
+        this.map.addLayer({
+          id: 'points',
+          source: 'points',
+          type: 'circle',
+          paint: {
+            'circle-color': '#4264fb',
+            'circle-radius': 15,
+            'circle-stroke-width': 2,
+            'circle-stroke-color': '#000000',
+          },
+        });
       });
-    });
   }
 
   centerOnClick() {
