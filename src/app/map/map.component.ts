@@ -135,7 +135,7 @@ export class MapComponent implements OnInit {
       e.preventDefault();
       this.map.once('mouseup', () => {
         this.store.select(fromMap.getLayers).subscribe((layers) => {
-          this.updateLayers(layers);
+          layers?.length && this.updateLayers(layers);
         });
       });
     });
