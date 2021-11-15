@@ -1,4 +1,4 @@
-import { Injectable, OnInit } from '@angular/core';
+import { Injectable } from '@angular/core';
 import * as mapboxgl from 'mapbox-gl';
 import { environment } from 'src/environments/environment';
 import { Store } from '@ngrx/store';
@@ -10,26 +10,20 @@ import * as _ from 'lodash';
 @Injectable({
   providedIn: 'root',
 })
-export class MapService implements OnInit {
-  map: mapboxgl.Map;
 
-  initialLongitude = -90.3295;
-  initialLatitude = -0.6344;
-  initialZoom = 5;
+export class MapService {
+  map: mapboxgl.Map;
   dragging: string;
   newLayers: fromMap.IPointFeature[];
   constructor(private store: Store<fromMap.IMapState>) {}
-  ngOnInit(): void {
-    throw new Error('Method not implemented.');
-  }
 
   createMap() {
     this.map = new mapboxgl.Map({
       accessToken: environment.mapbox.accessToken,
       container: 'map',
       style: `https://api.maptiler.com/maps/eef16200-c4cc-4285-9370-c71ca24bb42d/style.json?key=${environment.mapTiler.key}`,
-      zoom: this.initialZoom,
-      center: [this.initialLongitude, this.initialLatitude],
+      zoom: 2,
+      center: [0, 0],
     });
     this.map.addControl(new mapboxgl.NavigationControl());
 
