@@ -1,47 +1,23 @@
 import { Injectable, OnInit } from '@angular/core';
 import * as mapboxgl from 'mapbox-gl';
 import { environment } from 'src/environments/environment';
+import { Store } from '@ngrx/store';
+import * as fromMap from './map.reducer';
+import * as Map from './map.actions';
+import * as _ from 'lodash';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MapService implements OnInit {
   map: mapboxgl.Map;
-  data: any = {
-    type: 'FeatureCollection',
-    features: [
-      {
-        type: 'Feature',
-        properties: { description: 'First' },
-        geometry: {
-          type: 'Point',
-          coordinates: [-91.3952, -0.9145],
-        },
-      },
-      {
-        type: 'Feature',
-        properties: { description: 'Second' },
-        geometry: {
-          type: 'Point',
-          coordinates: [-90.3295, -0.6344],
-        },
-      },
-      {
-        type: 'Feature',
-        properties: { description: 'Third' },
-        geometry: {
-          type: 'Point',
-          coordinates: [-91.3403, 0.0164],
-        },
-      },
-    ],
-  };
 
   initialLongitude = -90.3295;
   initialLatitude = -0.6344;
   initialZoom = 5;
   dragging: string;
-  constructor() {}
+  newLayers: fromMap.IPointFeature[];
+  constructor(private store: Store<fromMap.IMapState>) {}
   ngOnInit(): void {
     throw new Error('Method not implemented.');
   }
@@ -87,37 +63,46 @@ export class MapService implements OnInit {
   ) {
     const lng = e.lngLat.lng;
     const lat = e.lngLat.lat;
-    const index = this.data.features.findIndex(
-      (point: any) => point.properties.description === this.dragging
-    );
-    this.data.features[index].geometry.coordinates = [lng, lat];
+    this.store.select(fromMap.getLayers).subscribe((layers) => {
+      const index = layers.findIndex(
+        (point: any) => point.properties.description === this.dragging
+      );
 
-    const source: mapboxgl.GeoJSONSource = this.map.getSource(
-      'initial'
-    ) as mapboxgl.GeoJSONSource;
-    source.setData(this.data);
+      this.newLayers = _.cloneDeep(layers);
+      this.newLayers[index].geometry.coordinates = [lng, lat];
+      console.log(this.newLayers);
+
+      const source: mapboxgl.GeoJSONSource = this.map.getSource(
+        'initial'
+      ) as mapboxgl.GeoJSONSource;
+      source.setData({ type: 'FeatureCollection', features: this.newLayers });
+    });
   }
 
   onUp() {
+    this.store.dispatch(new Map.setLayers(this.newLayers));
     this.map.off('mousemove', (e) => this.onMove(e));
   }
 
   addLayers() {
-    this.map.addSource('initial', {
-      type: 'geojson',
-      data: this.data,
-    });
+    // TODO: only runs if there is no source with id
+    this.store.select(fromMap.getLayers).subscribe((layers) => {
+      this.map.addSource('initial', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: layers },
+      });
 
-    this.map.addLayer({
-      id: 'initial',
-      source: 'initial',
-      type: 'circle',
-      paint: {
-        'circle-color': '#4264fb',
-        'circle-radius': 15,
-        'circle-stroke-width': 2,
-        'circle-stroke-color': '#000000',
-      },
+      this.map.addLayer({
+        id: 'initial',
+        source: 'initial',
+        type: 'circle',
+        paint: {
+          'circle-color': '#4264fb',
+          'circle-radius': 15,
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#000000',
+        },
+      });
     });
   }
 
@@ -156,8 +141,10 @@ export class MapService implements OnInit {
 
   fitScreen() {
     var bounds = new mapboxgl.LngLatBounds();
-    this.data.features.forEach((feature: any) => {
-      bounds.extend(feature.geometry.coordinates);
+    this.store.select(fromMap.getLayers).subscribe((layers) => {
+      layers.forEach((layer) => {
+        bounds.extend(layer.geometry.coordinates);
+      });
     });
 
     this.map.fitBounds(bounds, { padding: 100 });

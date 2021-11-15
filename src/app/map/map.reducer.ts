@@ -1,13 +1,11 @@
-import {
-  mapActions,
-  SET_LAYERS,
-} from './map.actions';
+import { createFeatureSelector, createSelector } from '@ngrx/store';
+import { mapActions, SET_LAYERS } from './map.actions';
 
 export interface IMapState {
   layers: IPointFeature[];
 }
 
-interface IPointFeature {
+export interface IPointFeature {
   type: 'Feature';
   properties: { description: string };
   geometry: { type: 'Point'; coordinates: [number, number] };
@@ -47,7 +45,7 @@ export function mapReducer(state = initialState, action: mapActions) {
     case SET_LAYERS:
       return {
         ...state,
-        userUid: action.payload,
+        layers: action.payload,
       };
     default: {
       return state;
@@ -55,4 +53,9 @@ export function mapReducer(state = initialState, action: mapActions) {
   }
 }
 
-export const getLayers = (state: IMapState) => state.layers;
+export const getMapState = createFeatureSelector<IMapState>('map');
+
+export const getLayers = createSelector(
+  getMapState,
+  (state: IMapState) => state.layers
+);
