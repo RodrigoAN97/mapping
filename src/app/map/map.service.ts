@@ -43,7 +43,7 @@ export class MapService implements OnInit {
 
   makeDraggable() {
     let down = false;
-    this.map.on('mousedown', 'initial', (e) => {
+    this.map.on('mousedown', 'points', (e) => {
       down = true;
       const description = e.features && e.features[0].properties?.description;
       this.dragging = description;
@@ -70,10 +70,9 @@ export class MapService implements OnInit {
 
       this.newLayers = _.cloneDeep(layers);
       this.newLayers[index].geometry.coordinates = [lng, lat];
-      console.log(this.newLayers);
 
       const source: mapboxgl.GeoJSONSource = this.map.getSource(
-        'initial'
+        'points'
       ) as mapboxgl.GeoJSONSource;
       source.setData({ type: 'FeatureCollection', features: this.newLayers });
     });
@@ -87,14 +86,14 @@ export class MapService implements OnInit {
   addLayers() {
     // TODO: only runs if there is no source with id
     this.store.select(fromMap.getLayers).subscribe((layers) => {
-      this.map.addSource('initial', {
+      this.map.addSource('points', {
         type: 'geojson',
         data: { type: 'FeatureCollection', features: layers },
       });
 
       this.map.addLayer({
-        id: 'initial',
-        source: 'initial',
+        id: 'points',
+        source: 'points',
         type: 'circle',
         paint: {
           'circle-color': '#4264fb',
@@ -107,7 +106,7 @@ export class MapService implements OnInit {
   }
 
   centerOnClick() {
-    this.map.on('click', 'initial', (e) => {
+    this.map.on('click', 'points', (e) => {
       if (e.features) {
         this.map.flyTo({
           center: (e.features[0].geometry as any).coordinates,
@@ -118,17 +117,17 @@ export class MapService implements OnInit {
   }
 
   getPointerCursorOnEnter() {
-    this.map.on('mouseenter', 'initial', () => {
+    this.map.on('mouseenter', 'points', () => {
       this.map.getCanvas().style.cursor = 'pointer';
     });
 
-    this.map.on('mouseleave', 'initial', () => {
+    this.map.on('mouseleave', 'points', () => {
       this.map.getCanvas().style.cursor = '';
     });
   }
 
   setPopUp() {
-    this.map.on('dblclick', 'initial', (e) => {
+    this.map.on('dblclick', 'points', (e) => {
       if (e.features && e.features[0].properties) {
         e.preventDefault();
         new mapboxgl.Popup()
