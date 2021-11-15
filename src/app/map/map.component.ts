@@ -46,9 +46,22 @@ export class MapComponent implements OnInit {
     this.mapService.fitScreen();
   }
 
-  addLayerOnForm(add: AbstractControl) {
+  addLayerOnForm(add: AbstractControl | null) {
+    if (add === null) {
+      const center = this.map.getCenter();
+      add = this.formBuilder.group({
+        description: [Math.random(), Validators.required],
+        longitude: [center.lng, Validators.required],
+        latitude: [center.lat, Validators.required],
+      });
+    }
     this.layersArray = this.layersFields;
     this.layersArray.push(add);
+  }
+
+  deleteLayerOnForm(index: number) {
+    this.layersArray = this.layersFields;
+    this.layersArray.removeAt(index);
   }
 
   hideShowLayers() {

@@ -54,8 +54,23 @@
               formControlName="latitude"
             />
           </mat-form-field>
+          <div class="delete">
+            <button
+              (click)="deleteLayerOnForm(i)"
+              mat-icon-button
+              color="accent"
+            >
+              Delete <mat-icon>delete_forever</mat-icon>
+            </button>
+          </div>
           <mat-divider class="formDivider"></mat-divider>
         </div>
+      </div>
+      <mat-divider></mat-divider>
+      <div class="delete">
+        <button (click)="addLayerOnForm(null)" mat-icon-button color="primary">
+          Add <mat-icon>add_circle</mat-icon>
+        </button>
       </div>
     </form>
   </mat-drawer>
