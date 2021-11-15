@@ -16,6 +16,8 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from '../environments/environment'; // Angular CLI environment
 import { reducers } from './app.reducer';
 import { ReactiveFormsModule } from '@angular/forms';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+
 @NgModule({
   declarations: [AppComponent, MapComponent],
   imports: [
@@ -29,6 +31,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     MatListModule,
     MatInputModule,
     ReactiveFormsModule,
+    MatSnackBarModule,
     StoreModule.forRoot(reducers),
     StoreDevtoolsModule.instrument({
       maxAge: 25,

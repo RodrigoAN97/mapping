@@ -3,6 +3,7 @@ import { MapService } from './map.service';
 import { Store } from '@ngrx/store';
 import * as fromMap from './map.reducer';
 import * as Map from './map.actions';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   AbstractControl,
   FormArray,
@@ -25,7 +26,8 @@ export class MapComponent implements OnInit {
   constructor(
     private mapService: MapService,
     public store: Store<fromMap.IMapState>,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private snackBar: MatSnackBar
   ) {
     this.mapsForm = this.formBuilder.group({
       layers: this.formBuilder.array([]),
@@ -80,16 +82,24 @@ export class MapComponent implements OnInit {
       });
 
     this.mapsForm.valueChanges.subscribe((changes) => {
+      let descriptions: string[] = [];
       let newLayers: fromMap.IPointFeature[] = changes.layers.map(
         (layer: any) => {
-          return {
-            type: 'Feature',
-            properties: { description: layer.description },
-            geometry: {
-              type: 'Point',
-              coordinates: [layer.longitude, layer.latitude],
-            },
-          };
+          if (!descriptions.includes(layer.description)) {
+            descriptions.push(layer.description);
+            return {
+              type: 'Feature',
+              properties: { description: layer.description },
+              geometry: {
+                type: 'Point',
+                coordinates: [layer.longitude, layer.latitude],
+              },
+            };
+          } else {
+            this.snackBar.open('Description needs to be unique', 'ERROR', {
+              duration: 3000,
+            });
+          }
         }
       );
       const source: mapboxgl.GeoJSONSource = this.map.getSource(
