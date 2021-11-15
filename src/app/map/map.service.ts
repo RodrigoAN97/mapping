@@ -10,12 +10,12 @@ import * as _ from 'lodash';
 @Injectable({
   providedIn: 'root',
 })
-
 export class MapService {
   map: mapboxgl.Map;
-  dragging: string;
+  dragging: string | null;
+  move:any;
   newLayers: fromMap.IPointFeature[];
-  constructor(private store: Store<fromMap.IMapState>) {}
+  constructor(public store: Store<fromMap.IMapState>) {}
 
   createMap() {
     this.map = new mapboxgl.Map({
@@ -39,17 +39,12 @@ export class MapService {
   }
 
   makeDraggable() {
-    let down = false;
     this.map.on('mousedown', 'points', (e) => {
-      down = true;
       const description = e.features && e.features[0].properties?.description;
       this.dragging = description;
       e.preventDefault();
-      this.map.on('mousemove', (e) => {
-        down && this.onMove(e);
-      });
+      this.map.on('mousemove', this.move = this.onMove.bind(this));
       this.map.once('mouseup', () => {
-        down = false;
         this.onUp();
       });
     });
@@ -61,23 +56,25 @@ export class MapService {
     const lng = e.lngLat.lng;
     const lat = e.lngLat.lat;
     this.store.select(fromMap.getLayers).subscribe((layers) => {
-      const index = layers.findIndex(
-        (point: any) => point.properties.description === this.dragging
-      );
+      if (this.dragging) {
+        const index = layers.findIndex(
+          (point: any) => point.properties.description === this.dragging
+        );
 
-      this.newLayers = _.cloneDeep(layers);
-      this.newLayers[index].geometry.coordinates = [lng, lat];
+        this.newLayers = _.cloneDeep(layers);
+        this.newLayers[index].geometry.coordinates = [lng, lat];
 
-      const source: mapboxgl.GeoJSONSource = this.map.getSource(
-        'points'
-      ) as mapboxgl.GeoJSONSource;
-      source.setData({ type: 'FeatureCollection', features: this.newLayers });
+        const source: mapboxgl.GeoJSONSource = this.map.getSource(
+          'points'
+        ) as mapboxgl.GeoJSONSource;
+        source.setData({ type: 'FeatureCollection', features: this.newLayers });
+      }
     });
   }
 
   onUp() {
     this.store.dispatch(new Map.setLayers(this.newLayers));
-    this.map.off('mousemove', (e) => this.onMove(e));
+    this.map.off('mousemove', this.move);
   }
 
   initialLayers() {
