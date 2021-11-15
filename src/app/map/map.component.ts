@@ -54,14 +54,13 @@ export class MapComponent implements OnInit {
     if (add === null) {
       const center = this.map.getCenter();
       add = this.formBuilder.group({
-        description: [Math.random(), Validators.required],
+        description: ['', Validators.required],
         longitude: [center.lng, Validators.required],
         latitude: [center.lat, Validators.required],
       });
     }
     this.layersArray = this.layersFields;
     this.layersArray.push(add);
-    console.log(this.layersArray.value);
   }
 
   deleteLayerOnForm(index: number) {
@@ -106,14 +105,17 @@ export class MapComponent implements OnInit {
 
     this.layersFields.valueChanges.subscribe((changes) => {
       let newLayers: fromMap.IPointFeature[] = changes.map((layer: any) => {
-          return {
-            type: 'Feature',
-            properties: { description: layer.description },
-            geometry: {
-              type: 'Point',
-              coordinates: [layer.longitude, layer.latitude],
-            },
-          };
+        return {
+          type: 'Feature',
+          properties: {
+            description: layer.description,
+            id: layer.id || Math.random(),
+          },
+          geometry: {
+            type: 'Point',
+            coordinates: [layer.longitude, layer.latitude],
+          },
+        };
       });
       const source: mapboxgl.GeoJSONSource = this.map.getSource(
         'points'

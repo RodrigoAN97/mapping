@@ -40,8 +40,8 @@ export class MapService {
 
   makeDraggable() {
     this.map.on('mousedown', 'points', (e) => {
-      const description = e.features && e.features[0].properties?.description;
-      this.dragging = description;
+      const id = e.features && e.features[0].properties?.id;
+      this.dragging = id;
       e.preventDefault();
       this.map.on('mousemove', this.move = this.onMove.bind(this));
       this.map.once('mouseup', () => {
@@ -58,7 +58,7 @@ export class MapService {
     this.store.select(fromMap.getLayers).subscribe((layers) => {
       if (this.dragging) {
         const index = layers.findIndex(
-          (point: any) => point.properties.description === this.dragging
+          (point: any) => point.properties.id === this.dragging
         );
 
         this.newLayers = _.cloneDeep(layers);

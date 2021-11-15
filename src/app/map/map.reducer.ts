@@ -8,7 +8,7 @@ export interface IMapState {
 
 export interface IPointFeature {
   type: 'Feature';
-  properties: { description: string };
+  properties: { description: string; id: number };
   geometry: { type: 'Point'; coordinates: [number, number] };
 }
 
@@ -16,7 +16,7 @@ const initialState: IMapState = {
   layers: [
     {
       type: 'Feature',
-      properties: { description: 'First' },
+      properties: { description: 'First', id: Math.random() },
       geometry: {
         type: 'Point',
         coordinates: [-91.3952, -0.9145],
@@ -24,7 +24,7 @@ const initialState: IMapState = {
     },
     {
       type: 'Feature',
-      properties: { description: 'Second' },
+      properties: { description: 'Second', id: Math.random() },
       geometry: {
         type: 'Point',
         coordinates: [-90.3295, -0.6344],
@@ -32,7 +32,7 @@ const initialState: IMapState = {
     },
     {
       type: 'Feature',
-      properties: { description: 'Third' },
+      properties: { description: 'Third', id: Math.random() },
       geometry: {
         type: 'Point',
         coordinates: [-91.3403, 0.0164],
