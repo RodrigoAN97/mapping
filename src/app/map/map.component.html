@@ -18,7 +18,7 @@
     <mat-divider></mat-divider>
     <div class="line">
       <button mat-raised-button color="accent" (click)="hideShowLayers()">
-        Hide all Points
+        {{ pointsVisible ? "Hide all points" : "Show all points" }}
       </button>
     </div>
   </mat-drawer>

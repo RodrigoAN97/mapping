@@ -11,6 +11,7 @@ import * as Map from './map.actions';
 })
 export class MapComponent implements OnInit {
   map: mapboxgl.Map;
+  pointsVisible = true;
   constructor(
     private mapService: MapService,
     private store: Store<fromMap.IMapState>
@@ -21,16 +22,16 @@ export class MapComponent implements OnInit {
   }
 
   hideShowLayers() {
-    const visible =
+    this.pointsVisible =
       this.map.getLayoutProperty('points', 'visibility') === 'visible' ||
       !this.map.getLayoutProperty('points', 'visibility');
-    if (visible) {
+    if (this.pointsVisible) {
       this.map.setLayoutProperty('points', 'visibility', 'none');
-      this.store.dispatch(new Map.setLayersVisible(false));
     } else {
       this.map.setLayoutProperty('points', 'visibility', 'visible');
-      this.store.dispatch(new Map.setLayersVisible(true));
     }
+    this.store.dispatch(new Map.setLayersVisible(!this.pointsVisible));
+    this.pointsVisible = !this.pointsVisible;
   }
 
   ngOnInit(): void {
