@@ -40,6 +40,8 @@ export class MapService implements OnInit {
       this.centerOnClick();
       this.makeDraggable();
     });
+
+    return this.map;
   }
 
   makeDraggable() {

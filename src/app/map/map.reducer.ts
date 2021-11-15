@@ -1,8 +1,9 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { mapActions, SET_LAYERS } from './map.actions';
+import { mapActions, SET_LAYERS, SET_LAYERS_VISIBLE } from './map.actions';
 
 export interface IMapState {
   layers: IPointFeature[];
+  layersVisible: boolean;
 }
 
 export interface IPointFeature {
@@ -38,6 +39,7 @@ const initialState: IMapState = {
       },
     },
   ],
+  layersVisible: true,
 };
 
 export function mapReducer(state = initialState, action: mapActions) {
@@ -47,6 +49,8 @@ export function mapReducer(state = initialState, action: mapActions) {
         ...state,
         layers: action.payload,
       };
+    case SET_LAYERS_VISIBLE:
+      return { ...state, layersVisible: action.payload };
     default: {
       return state;
     }
@@ -58,4 +62,9 @@ export const getMapState = createFeatureSelector<IMapState>('map');
 export const getLayers = createSelector(
   getMapState,
   (state: IMapState) => state.layers
+);
+
+export const getLayersVisible = createSelector(
+  getMapState,
+  (state: IMapState) => state.layersVisible
 );
