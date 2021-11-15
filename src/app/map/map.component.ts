@@ -29,6 +29,10 @@ export class MapComponent implements OnInit {
     private formBuilder: FormBuilder,
     private snackBar: MatSnackBar
   ) {
+    this.initialForm();
+  }
+
+  initialForm() {
     this.mapsForm = this.formBuilder.group({
       layers: this.formBuilder.array([]),
     });
@@ -77,6 +81,18 @@ export class MapComponent implements OnInit {
     this.pointsVisible = !this.pointsVisible;
   }
 
+  updateLayers(layers: fromMap.IPointFeature[]) {
+    this.initialForm();
+    for (let layer of layers) {
+      const newLayer = this.formBuilder.group({
+        description: [layer.properties.description, Validators.required],
+        longitude: [layer.geometry.coordinates[0], Validators.required],
+        latitude: [layer.geometry.coordinates[1], Validators.required],
+      });
+      this.addLayerOnForm(newLayer);
+    }
+  }
+
   ngOnInit(): void {
     this.map = this.mapService.createMap();
 
@@ -84,14 +100,7 @@ export class MapComponent implements OnInit {
       .select(fromMap.getLayers)
       .pipe(first())
       .subscribe((layers) => {
-        for (let layer of layers) {
-          const newLayer = this.formBuilder.group({
-            description: [layer.properties.description, Validators.required],
-            longitude: [layer.geometry.coordinates[0], Validators.required],
-            latitude: [layer.geometry.coordinates[1], Validators.required],
-          });
-          this.addLayerOnForm(newLayer);
-        }
+        this.updateLayers(layers);
       });
 
     this.mapsForm.valueChanges.subscribe((changes) => {
@@ -120,6 +129,15 @@ export class MapComponent implements OnInit {
       ) as mapboxgl.GeoJSONSource;
       source.setData({ type: 'FeatureCollection', features: newLayers });
       this.store.dispatch(new Map.setLayers(newLayers));
+    });
+
+    this.map.on('mousedown', 'points', (e) => {
+      e.preventDefault();
+      this.map.once('mouseup', () => {
+        this.store.select(fromMap.getLayers).subscribe((layers) => {
+          this.updateLayers(layers);
+        });
+      });
     });
   }
 }
