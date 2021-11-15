@@ -27,7 +27,7 @@
         formArrayName="layers"
         *ngFor="let field of layersFields.controls; let i = index"
       >
-        <div [formGroupName]="i">
+        <div [formGroupName]="i" class="layerField">
           <mat-form-field appearance="fill">
             <mat-label>Description</mat-label>
             <input
@@ -66,7 +66,6 @@
           <mat-divider class="formDivider"></mat-divider>
         </div>
       </div>
-      <mat-divider></mat-divider>
       <div class="delete">
         <button (click)="addLayerOnForm(null)" mat-icon-button color="primary">
           Add <mat-icon>add_circle</mat-icon>
