@@ -34,7 +34,7 @@ export class MapService implements OnInit {
     this.map.addControl(new mapboxgl.NavigationControl());
 
     this.map.on('load', () => {
-      this.addLayers();
+      this.initialLayers();
       this.setPopUp();
       this.getPointerCursorOnEnter();
       this.centerOnClick();
@@ -84,7 +84,7 @@ export class MapService implements OnInit {
     this.map.off('mousemove', (e) => this.onMove(e));
   }
 
-  addLayers() {
+  initialLayers() {
     this.store
       .select(fromMap.getLayers)
       .pipe(first())
