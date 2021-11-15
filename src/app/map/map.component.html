@@ -21,6 +21,72 @@
         {{ pointsVisible ? "Hide all points" : "Show all points" }}
       </button>
     </div>
+    <mat-divider></mat-divider>
+    <!-- <form *ngFor="let layer of store.select(fromMap.getLayers) | async">
+      <mat-form-field appearance="fill">
+        <mat-label>Description</mat-label>
+        <input
+          matInput
+          placeholder="Needs to be unique"
+          [value]="layer.properties.description"
+        />
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Longitude</mat-label>
+        <input
+          type="number"
+          matInput
+          placeholder="Longitude"
+          [value]="layer.geometry.coordinates[0]"
+        />
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Latitude</mat-label>
+        <input
+          type="number"
+          matInput
+          placeholder="Latitude"
+          [value]="layer.geometry.coordinates[1]"
+        />
+      </mat-form-field>
+      <mat-divider class="formDivider"></mat-divider>
+    </form> -->
+    <form [formGroup]="mapsForm">
+      <div
+        formArrayName="layers"
+        *ngFor="let field of layersFields.controls; let i = index"
+      >
+        <div [formGroupName]="i">
+          <mat-form-field appearance="fill">
+            <mat-label>Description</mat-label>
+            <input
+              matInput
+              placeholder="Needs to be unique"
+              formControlName="description"
+            />
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Longitude</mat-label>
+            <input
+              type="number"
+              matInput
+              placeholder="Longitude"
+              formControlName="longitude"
+            />
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Latitude</mat-label>
+            <input
+              type="number"
+              matInput
+              placeholder="Latitude"
+              formControlName="latitude"
+            />
+          </mat-form-field>
+          <mat-divider class="formDivider"></mat-divider>
+        </div>
+      </div>
+    </form>
   </mat-drawer>
   <mat-drawer-content>
     <div id="map" class="map-container"></div>

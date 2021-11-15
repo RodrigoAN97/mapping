@@ -11,9 +11,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
 import { StoreModule } from '@ngrx/store';
+import { MatInputModule } from '@angular/material/input';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from '../environments/environment'; // Angular CLI environment
 import { reducers } from './app.reducer';
+import { ReactiveFormsModule } from '@angular/forms';
 @NgModule({
   declarations: [AppComponent, MapComponent],
   imports: [
@@ -25,6 +27,8 @@ import { reducers } from './app.reducer';
     MatButtonModule,
     MatDividerModule,
     MatListModule,
+    MatInputModule,
+    ReactiveFormsModule,
     StoreModule.forRoot(reducers),
     StoreDevtoolsModule.instrument({
       maxAge: 25,

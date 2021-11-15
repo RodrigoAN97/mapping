@@ -16,3 +16,14 @@
 .line {
   margin: 10px 10px;
 }
+
+.formDivider {
+  background: #3f51b5;
+  border-top-width: 5px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
