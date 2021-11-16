@@ -57,7 +57,7 @@ export class MapComponent implements OnInit, OnDestroy {
     if (add === null) {
       const center = this.map.getCenter();
       add = this.formBuilder.group({
-        description: ['', Validators.required],
+        description: [''],
         longitude: [center.lng, Validators.required],
         latitude: [center.lat, Validators.required],
       });
@@ -85,7 +85,7 @@ export class MapComponent implements OnInit, OnDestroy {
   initialLayers(layers: fromMap.IPointFeature[]) {
     for (let layer of layers) {
       const newLayer = this.formBuilder.group({
-        description: [layer.properties.description, Validators.required],
+        description: [layer.properties.description],
         longitude: [layer.geometry.coordinates[0], Validators.required],
         latitude: [layer.geometry.coordinates[1], Validators.required],
       });
