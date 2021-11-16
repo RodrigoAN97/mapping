@@ -16,7 +16,7 @@ const initialState: IMapState = {
   layers: [
     {
       type: 'Feature',
-      properties: { description: 'First', id: Math.random() },
+      properties: { description: 'First', id: 0 },
       geometry: {
         type: 'Point',
         coordinates: [-91.3952, -0.9145],
@@ -24,7 +24,7 @@ const initialState: IMapState = {
     },
     {
       type: 'Feature',
-      properties: { description: 'Second', id: Math.random() },
+      properties: { description: 'Second', id: 1 },
       geometry: {
         type: 'Point',
         coordinates: [-90.3295, -0.6344],
@@ -32,7 +32,7 @@ const initialState: IMapState = {
     },
     {
       type: 'Feature',
-      properties: { description: 'Third', id: Math.random() },
+      properties: { description: 'Third', id: 2 },
       geometry: {
         type: 'Point',
         coordinates: [-91.3403, 0.0164],

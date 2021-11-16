@@ -3,7 +3,6 @@ import { MapService } from './map.service';
 import { Store } from '@ngrx/store';
 import * as fromMap from './map.reducer';
 import * as Map from './map.actions';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   AbstractControl,
   FormArray,
@@ -26,8 +25,7 @@ export class MapComponent implements OnInit {
   constructor(
     private mapService: MapService,
     public store: Store<fromMap.IMapState>,
-    private formBuilder: FormBuilder,
-    private snackBar: MatSnackBar
+    private formBuilder: FormBuilder
   ) {
     this.initialForm();
   }
@@ -114,19 +112,22 @@ export class MapComponent implements OnInit {
       });
 
     this.layersFields.valueChanges.subscribe((changes) => {
-      let newLayers: fromMap.IPointFeature[] = changes.map((layer: any) => {
-        return {
-          type: 'Feature',
-          properties: {
-            description: layer.description,
-            id: layer.id || Math.random(),
-          },
-          geometry: {
-            type: 'Point',
-            coordinates: [layer.longitude, layer.latitude],
-          },
-        };
-      });
+      let newLayers: fromMap.IPointFeature[] = changes.map(
+        (layer: any, index: number) => {
+          return {
+            type: 'Feature',
+            properties: {
+              description: layer.description,
+              id: index,
+            },
+            geometry: {
+              type: 'Point',
+              coordinates: [layer.longitude, layer.latitude],
+            },
+          };
+        }
+      );
+      console.log(newLayers);
       const source: mapboxgl.GeoJSONSource = this.map.getSource(
         'points'
       ) as mapboxgl.GeoJSONSource;
