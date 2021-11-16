@@ -144,9 +144,8 @@ export class MapService implements OnDestroy {
         layers.forEach((layer) => {
           bounds.extend(layer.geometry.coordinates);
         });
+        this.map.fitBounds(bounds, { padding: 200 });
       });
-
-    this.map.fitBounds(bounds, { padding: 100 });
   }
 
   ngOnDestroy() {
