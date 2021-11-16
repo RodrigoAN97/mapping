@@ -13,6 +13,11 @@ import {
 import { first } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
+interface IFormLayer {
+  description: string;
+  longitude: number;
+  latitude: number;
+}
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
@@ -92,7 +97,7 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   updateCoordinates(updatedLayers: fromMap.IPointFeature[]) {
-    const newLayers = this.layersFields.value.map((layer: any, i: number) => {
+    const newLayers = this.layersFields.value.map((layer: IFormLayer, i: number) => {
       const coordinates = updatedLayers[i].geometry.coordinates;
       layer.longitude = coordinates[0];
       layer.latitude = coordinates[1];
@@ -114,7 +119,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
     this.formChanges = this.layersFields.valueChanges.subscribe((changes) => {
       let newLayers: fromMap.IPointFeature[] = changes.map(
-        (layer: any, index: number) => {
+        (layer: IFormLayer, index: number) => {
           return {
             type: 'Feature',
             properties: {
