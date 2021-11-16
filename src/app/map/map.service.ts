@@ -1,21 +1,24 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import * as mapboxgl from 'mapbox-gl';
 import { environment } from 'src/environments/environment';
 import { Store } from '@ngrx/store';
-import { first } from 'rxjs/operators';
 import * as fromMap from './map.reducer';
 import * as Map from './map.actions';
 import * as _ from 'lodash';
+import { Subscription } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
-export class MapService {
+export class MapService implements OnDestroy {
   map: mapboxgl.Map;
   dragging: number;
   move: any;
   newLayers: fromMap.IPointFeature[];
   constructor(public store: Store<fromMap.IMapState>) {}
+
+  updatedLayers: Subscription;
+  fitLayers: Subscription;
 
   createMap() {
     this.map = new mapboxgl.Map({
@@ -28,7 +31,6 @@ export class MapService {
     this.map.addControl(new mapboxgl.NavigationControl());
 
     this.map.on('load', () => {
-      this.initialLayers();
       this.setPopUp();
       this.getPointerCursorOnEnter();
       this.centerOnClick();
@@ -54,20 +56,25 @@ export class MapService {
   ) {
     const lng = e.lngLat.lng;
     const lat = e.lngLat.lat;
-    this.store.select(fromMap.getLayers).subscribe((layers) => {
-      if (this.dragging >= 0) {
-        const index = layers.findIndex(
-          (point: any) => point.properties.id === this.dragging
-        );
-        this.newLayers = _.cloneDeep(layers);
-        this.newLayers[index].geometry.coordinates = [lng, lat];
+    this.updatedLayers = this.store
+      .select(fromMap.getLayers)
+      .subscribe((layers) => {
+        if (this.dragging >= 0) {
+          const index = layers.findIndex(
+            (point: any) => point.properties.id === this.dragging
+          );
+          this.newLayers = _.cloneDeep(layers);
+          this.newLayers[index].geometry.coordinates = [lng, lat];
 
-        const source: mapboxgl.GeoJSONSource = this.map.getSource(
-          'points'
-        ) as mapboxgl.GeoJSONSource;
-        source.setData({ type: 'FeatureCollection', features: this.newLayers });
-      }
-    });
+          const source: mapboxgl.GeoJSONSource = this.map.getSource(
+            'points'
+          ) as mapboxgl.GeoJSONSource;
+          source.setData({
+            type: 'FeatureCollection',
+            features: this.newLayers,
+          });
+        }
+      });
   }
 
   onUp() {
@@ -75,28 +82,25 @@ export class MapService {
     this.map.off('mousemove', this.move);
   }
 
-  initialLayers() {
-    this.store
-      .select(fromMap.getLayers)
-      .pipe(first())
-      .subscribe((layers) => {
-        this.map.addSource('points', {
-          type: 'geojson',
-          data: { type: 'FeatureCollection', features: layers },
-        });
-
-        this.map.addLayer({
-          id: 'points',
-          source: 'points',
-          type: 'circle',
-          paint: {
-            'circle-color': '#4264fb',
-            'circle-radius': 15,
-            'circle-stroke-width': 2,
-            'circle-stroke-color': '#000000',
-          },
-        });
+  addLayersOnMap(layers: fromMap.IPointFeature[]) {
+    this.map.on('load', () => {
+      this.map.addSource('points', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: layers },
       });
+
+      this.map.addLayer({
+        id: 'points',
+        source: 'points',
+        type: 'circle',
+        paint: {
+          'circle-color': '#4264fb',
+          'circle-radius': 15,
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#000000',
+        },
+      });
+    });
   }
 
   centerOnClick() {
@@ -134,12 +138,19 @@ export class MapService {
 
   fitScreen() {
     var bounds = new mapboxgl.LngLatBounds();
-    this.store.select(fromMap.getLayers).subscribe((layers) => {
-      layers.forEach((layer) => {
-        bounds.extend(layer.geometry.coordinates);
+    this.fitLayers = this.store
+      .select(fromMap.getLayers)
+      .subscribe((layers) => {
+        layers.forEach((layer) => {
+          bounds.extend(layer.geometry.coordinates);
+        });
       });
-    });
 
     this.map.fitBounds(bounds, { padding: 100 });
+  }
+
+  ngOnDestroy() {
+    this.updatedLayers.unsubscribe();
+    this.fitLayers.unsubscribe();
   }
 }

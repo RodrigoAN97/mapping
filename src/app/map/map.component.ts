@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MapService } from './map.service';
 import { Store } from '@ngrx/store';
 import * as fromMap from './map.reducer';
@@ -11,13 +11,14 @@ import {
   Validators,
 } from '@angular/forms';
 import { first } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.scss'],
 })
-export class MapComponent implements OnInit {
+export class MapComponent implements OnInit, OnDestroy {
   map: mapboxgl.Map;
   pointsVisible = true;
   mapsForm: FormGroup;
@@ -27,14 +28,14 @@ export class MapComponent implements OnInit {
     public store: Store<fromMap.IMapState>,
     private formBuilder: FormBuilder
   ) {
-    this.initialForm();
-  }
-
-  initialForm() {
     this.mapsForm = this.formBuilder.group({
       layers: this.formBuilder.array([]),
     });
   }
+
+  firstLayers: Subscription;
+  formChanges: Subscription;
+  updateFormAfterDrag: Subscription;
 
   get fromMap(): typeof fromMap {
     return fromMap;
@@ -80,7 +81,6 @@ export class MapComponent implements OnInit {
   }
 
   initialLayers(layers: fromMap.IPointFeature[]) {
-    this.initialForm();
     for (let layer of layers) {
       const newLayer = this.formBuilder.group({
         description: [layer.properties.description, Validators.required],
@@ -104,14 +104,15 @@ export class MapComponent implements OnInit {
   ngOnInit(): void {
     this.map = this.mapService.createMap();
 
-    this.store
+    this.firstLayers = this.store
       .select(fromMap.getLayers)
       .pipe(first())
       .subscribe((layers) => {
         this.initialLayers(layers);
+        this.mapService.addLayersOnMap(layers);
       });
 
-    this.layersFields.valueChanges.subscribe((changes) => {
+    this.formChanges = this.layersFields.valueChanges.subscribe((changes) => {
       let newLayers: fromMap.IPointFeature[] = changes.map(
         (layer: any, index: number) => {
           return {
@@ -127,7 +128,6 @@ export class MapComponent implements OnInit {
           };
         }
       );
-      console.log(newLayers);
       const source: mapboxgl.GeoJSONSource = this.map.getSource(
         'points'
       ) as mapboxgl.GeoJSONSource;
@@ -138,13 +138,19 @@ export class MapComponent implements OnInit {
     this.map.on('mousedown', 'points', (e) => {
       e.preventDefault();
       this.map.once('mouseup', () => {
-        this.store
+        this.updateFormAfterDrag = this.store
           .select(fromMap.getLayers)
           .pipe(first())
           .subscribe((layers) => {
-            layers?.length && this.updateCoordinates(layers);
+            this.updateCoordinates(layers);
           });
       });
     });
+  }
+
+  ngOnDestroy() {
+    this.firstLayers.unsubscribe();
+    this.formChanges.unsubscribe();
+    this.updateFormAfterDrag.unsubscribe();
   }
 }
