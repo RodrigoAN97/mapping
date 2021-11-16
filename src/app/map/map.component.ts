@@ -81,7 +81,7 @@ export class MapComponent implements OnInit {
     this.pointsVisible = !this.pointsVisible;
   }
 
-  updateLayers(layers: fromMap.IPointFeature[]) {
+  initialLayers(layers: fromMap.IPointFeature[]) {
     this.initialForm();
     for (let layer of layers) {
       const newLayer = this.formBuilder.group({
@@ -93,6 +93,16 @@ export class MapComponent implements OnInit {
     }
   }
 
+  updateCoordinates(updatedLayers: fromMap.IPointFeature[]) {
+    const newLayers = this.layersFields.value.map((layer: any, i: number) => {
+      const coordinates = updatedLayers[i].geometry.coordinates;
+      layer.longitude = coordinates[0];
+      layer.latitude = coordinates[1];
+      return layer;
+    });
+    this.layersFields.patchValue(newLayers);
+  }
+
   ngOnInit(): void {
     this.map = this.mapService.createMap();
 
@@ -100,7 +110,7 @@ export class MapComponent implements OnInit {
       .select(fromMap.getLayers)
       .pipe(first())
       .subscribe((layers) => {
-        this.updateLayers(layers);
+        this.initialLayers(layers);
       });
 
     this.layersFields.valueChanges.subscribe((changes) => {
@@ -127,9 +137,12 @@ export class MapComponent implements OnInit {
     this.map.on('mousedown', 'points', (e) => {
       e.preventDefault();
       this.map.once('mouseup', () => {
-        this.store.select(fromMap.getLayers).subscribe((layers) => {
-          layers?.length && this.updateLayers(layers);
-        });
+        this.store
+          .select(fromMap.getLayers)
+          .pipe(first())
+          .subscribe((layers) => {
+            layers?.length && this.updateCoordinates(layers);
+          });
       });
     });
   }

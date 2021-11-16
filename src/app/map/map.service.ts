@@ -13,7 +13,7 @@ import * as _ from 'lodash';
 export class MapService {
   map: mapboxgl.Map;
   dragging: string | null;
-  move:any;
+  move: any;
   newLayers: fromMap.IPointFeature[];
   constructor(public store: Store<fromMap.IMapState>) {}
 
@@ -40,10 +40,10 @@ export class MapService {
 
   makeDraggable() {
     this.map.on('mousedown', 'points', (e) => {
-      const id = e.features && e.features[0].properties?.id;
-      this.dragging = id;
+      const description = e.features && e.features[0].properties?.description;
+      this.dragging = description;
       e.preventDefault();
-      this.map.on('mousemove', this.move = this.onMove.bind(this));
+      this.map.on('mousemove', (this.move = this.onMove.bind(this)));
       this.map.once('mouseup', () => {
         this.onUp();
       });
@@ -58,9 +58,8 @@ export class MapService {
     this.store.select(fromMap.getLayers).subscribe((layers) => {
       if (this.dragging) {
         const index = layers.findIndex(
-          (point: any) => point.properties.id === this.dragging
+          (point: any) => point.properties.description === this.dragging
         );
-
         this.newLayers = _.cloneDeep(layers);
         this.newLayers[index].geometry.coordinates = [lng, lat];
 
