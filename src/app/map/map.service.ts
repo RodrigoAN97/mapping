@@ -59,7 +59,7 @@ export class MapService implements OnDestroy {
     this.updatedLayers = this.store
       .select(fromMap.getLayers)
       .subscribe((layers) => {
-        if (this.dragging >= 0) {
+        if (this.dragging >= 0 && layers) {
           const index = layers.findIndex(
             (point) => point.properties.id === this.dragging
           );
