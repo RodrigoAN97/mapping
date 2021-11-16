@@ -65,7 +65,6 @@ export class MapService implements OnDestroy {
           );
           this.newLayers = _.cloneDeep(layers);
           this.newLayers[index].geometry.coordinates = [lng, lat];
-
           const source: mapboxgl.GeoJSONSource = this.map.getSource(
             'points'
           ) as mapboxgl.GeoJSONSource;
@@ -78,7 +77,7 @@ export class MapService implements OnDestroy {
   }
 
   onUp() {
-    this.store.dispatch(new Map.setLayers(this.newLayers));
+    this.newLayers && this.store.dispatch(new Map.setLayers(this.newLayers));
     this.map.off('mousemove', this.move);
   }
 

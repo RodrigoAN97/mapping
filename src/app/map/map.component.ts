@@ -94,12 +94,14 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   updateCoordinates(updatedLayers: fromMap.IPointFeature[]) {
-    const newLayers = this.layersFields.value.map((layer: IFormLayer, i: number) => {
-      const coordinates = updatedLayers[i].geometry.coordinates;
-      layer.longitude = coordinates[0];
-      layer.latitude = coordinates[1];
-      return layer;
-    });
+    const newLayers = this.layersFields.value.map(
+      (layer: IFormLayer, i: number) => {
+        const coordinates = updatedLayers[i].geometry.coordinates;
+        layer.longitude = coordinates[0];
+        layer.latitude = coordinates[1];
+        return layer;
+      }
+    );
     this.layersFields.patchValue(newLayers);
   }
 
