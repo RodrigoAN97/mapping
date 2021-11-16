@@ -61,7 +61,7 @@ export class MapService implements OnDestroy {
       .subscribe((layers) => {
         if (this.dragging >= 0) {
           const index = layers.findIndex(
-            (point: any) => point.properties.id === this.dragging
+            (point) => point.properties.id === this.dragging
           );
           this.newLayers = _.cloneDeep(layers);
           this.newLayers[index].geometry.coordinates = [lng, lat];
