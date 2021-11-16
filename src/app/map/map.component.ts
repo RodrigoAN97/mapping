@@ -27,7 +27,6 @@ export class MapComponent implements OnInit, OnDestroy {
   map: mapboxgl.Map;
   pointsVisible = true;
   mapsForm: FormGroup;
-  layersArray: FormArray;
   constructor(
     private mapService: MapService,
     public store: Store<fromMap.IMapState>,
@@ -63,13 +62,11 @@ export class MapComponent implements OnInit, OnDestroy {
         latitude: [center.lat, Validators.required],
       });
     }
-    this.layersArray = this.layersFields;
-    this.layersArray.push(add);
+    this.layersFields.push(add);
   }
 
   deleteLayerOnForm(index: number) {
-    this.layersArray = this.layersFields;
-    this.layersArray.removeAt(index);
+    this.layersFields.removeAt(index);
   }
 
   hideShowLayers() {
