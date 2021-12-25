@@ -24,7 +24,7 @@ export class MapService implements OnDestroy {
     this.map = new mapboxgl.Map({
       accessToken: environment.mapbox.accessToken,
       container: 'map',
-      style: `https://api.maptiler.com/maps/eef16200-c4cc-4285-9370-c71ca24bb42d/style.json?key=${environment.mapTiler.key}`,
+      style: `https://api.maptiler.com/maps/topo/style.json?key=${environment.mapTiler.key}`,
       zoom: 2,
       center: [0, 0],
     });
